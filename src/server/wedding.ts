@@ -28,7 +28,7 @@ export async function createWedding(
       events: {
         create: {
           kind: "CERIMONIA",
-          title: "Cerimonia",
+          title: "Cerimônia",
           startsAt: input.date,
           venueName: input.venueName,
           address: input.address,

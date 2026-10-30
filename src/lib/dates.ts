@@ -3,8 +3,11 @@ const TZ = "America/Sao_Paulo";
 export const formatDate = (d: Date) =>
   new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
 
-export const formatDateLong = (d: Date) =>
-  new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(d);
+// "Sábado, 20 de março de 2027": só a primeira letra em maiúscula.
+export const formatDateLong = (d: Date) => {
+  const s = new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(d);
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 export const formatTime = (d: Date) =>
   new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(d).replace(":", "h");

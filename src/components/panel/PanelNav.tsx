@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/cn";
 
 export const NAV = [
-  { href: "/painel", label: "Visao geral", icon: LayoutDashboard },
+  { href: "/painel", label: "Visão geral", icon: LayoutDashboard },
   { href: "/painel/evento", label: "Evento", icon: CalendarHeart },
   { href: "/painel/convite", label: "Convite", icon: Mail },
   { href: "/painel/site", label: "Site e tema", icon: Palette },
@@ -16,7 +16,7 @@ export const NAV = [
   { href: "/painel/presentes", label: "Presentes", icon: Gift },
   { href: "/painel/pedidos", label: "Pedidos", icon: Receipt },
   { href: "/painel/recebimento", label: "Recebimento", icon: Wallet },
-  { href: "/painel/notificacoes", label: "Notificacoes", icon: Bell },
+  { href: "/painel/notificacoes", label: "Notificações", icon: Bell },
 ];
 
 export function PanelNav() {

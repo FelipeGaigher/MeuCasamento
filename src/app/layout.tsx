@@ -16,7 +16,7 @@ const greatVibes = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "-
 
 export const metadata: Metadata = {
   title: { default: "Meu Casamento", template: "%s · Meu Casamento" },
-  description: "Convite, site, confirmacao de presenca e lista de presentes do seu casamento, num lugar so.",
+  description: "Convite, site, confirmação de presença e lista de presentes do seu casamento, num lugar só.",
   metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
 };
 

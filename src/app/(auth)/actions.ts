@@ -11,13 +11,13 @@ import { fail, type ActionState } from "@/lib/action";
 
 const signupSchema = z.object({
   name: z.string().trim().min(2, "Informe seu nome."),
-  email: z.string().trim().toLowerCase().email("E-mail invalido."),
+  email: z.string().trim().toLowerCase().email("E-mail inválido."),
   password: z.string().min(8, "A senha precisa de pelo menos 8 caracteres."),
   coupleNames: z.string().trim().min(3, "Informe o nome do casal, por exemplo: Ana & Pedro."),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Informe a data do casamento."),
   time: z.string().regex(/^\d{2}:\d{2}$/).optional().or(z.literal("")),
-  venueName: z.string().trim().min(2, "Informe o local."),
-  address: z.string().trim().min(3, "Informe o endereco."),
+  venueName: z.string().trim().min(2, "Informe o local da cerimônia."),
+  address: z.string().trim().min(3, "Informe o endereço."),
   collectionKey: z.string().optional(),
 });
 
@@ -25,7 +25,7 @@ export async function signup(_: ActionState, form: FormData): Promise<ActionStat
   const parsed = signupSchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return fail(parsed.error.issues[0].message);
   const d = parsed.data;
-  if (await db.user.findUnique({ where: { email: d.email } })) return fail("Ja existe uma conta com esse e-mail.");
+  if (await db.user.findUnique({ where: { email: d.email } })) return fail("Já existe uma conta com esse e-mail.");
 
   const slug = await uniqueSlug(d.coupleNames);
   const user = await db.$transaction(async (tx) => {
@@ -46,7 +46,7 @@ export async function signup(_: ActionState, form: FormData): Promise<ActionStat
 }
 
 const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("E-mail invalido."),
+  email: z.string().trim().toLowerCase().email("E-mail inválido."),
   password: z.string().min(1, "Informe a senha."),
   voltar: z.string().optional(),
 });

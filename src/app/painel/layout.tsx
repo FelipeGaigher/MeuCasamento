@@ -23,9 +23,9 @@ export default async function PanelLayout({ children }: { children: React.ReactN
           </Link>
         </div>
         <PanelNav />
-        <form action={logout} className="mt-4 hidden border-t border-line pt-4 lg:block">
+        <form action={logout} className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3 lg:mt-4 lg:block lg:pt-4">
           <p className="t-meta truncate">{user.email}</p>
-          <button className="t-label mt-1 text-muted hover:text-ink">Sair</button>
+          <button className="t-label shrink-0 text-muted hover:text-ink lg:mt-1">Sair</button>
         </form>
       </aside>
       <main className="mx-auto w-full max-w-6xl p-4 sm:p-8">{children}</main>

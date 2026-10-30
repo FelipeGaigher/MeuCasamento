@@ -1,0 +1,14 @@
+# Desenvolvimento local: so o banco. A app roda com npm run dev.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: meucasamento
+      POSTGRES_PASSWORD: meucasamento
+      POSTGRES_DB: meucasamento
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:

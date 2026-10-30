@@ -11,10 +11,10 @@ export type InvitationPage = {
 
 export const PAGE_LABELS: Record<InvitationPageKind, string> = {
   capa: "Capa",
-  historia: "Nossa historia",
+  historia: "Nossa história",
   evento: "Quando e onde",
   presentes: "Como nos presentear",
-  rsvp: "Confirmacao de presenca",
+  rsvp: "Confirmação de presença",
   encerramento: "Encerramento",
 };
 
@@ -25,31 +25,31 @@ export const PAGE_FIELDS: Record<InvitationPageKind, [string, string, "text" | "
     ["phrase", "Frase", "textarea"],
   ],
   historia: [
-    ["title", "Titulo", "text"],
+    ["title", "Título", "text"],
     ["text", "Texto", "textarea"],
     ["note", "Nota manuscrita", "text"],
   ],
   evento: [
-    ["title", "Titulo", "text"],
+    ["title", "Título", "text"],
     ["text", "Texto", "textarea"],
   ],
   presentes: [
-    ["title", "Titulo", "text"],
-    ["intro", "Introducao", "textarea"],
+    ["title", "Título", "text"],
+    ["intro", "Introdução", "textarea"],
     ["step1", "Passo 1", "text"],
     ["step2", "Passo 2", "text"],
-    ["optionOnline", "Opcao: comprar pela lista", "textarea"],
-    ["optionFree", "Opcao: escolher por conta propria", "textarea"],
-    ["button", "Texto do botao", "text"],
+    ["optionOnline", "Opção: comprar pela lista", "textarea"],
+    ["optionFree", "Opção: escolher por conta própria", "textarea"],
+    ["button", "Texto do botão", "text"],
     ["note", "Faixa final", "text"],
   ],
   rsvp: [
-    ["title", "Titulo", "text"],
+    ["title", "Título", "text"],
     ["text", "Texto", "textarea"],
-    ["button", "Texto do botao", "text"],
+    ["button", "Texto do botão", "text"],
   ],
   encerramento: [
-    ["title", "Titulo", "text"],
+    ["title", "Título", "text"],
     ["text", "Agradecimento", "textarea"],
     ["signature", "Assinatura", "text"],
   ],
@@ -62,15 +62,15 @@ export function defaultInvitationPages(coupleNames: string): InvitationPage[] {
       enabled: true,
       fields: {
         kicker: "Casamento",
-        phrase: "Cada detalhe da nossa historia nos trouxe ate aqui. Agora queremos celebrar esse novo capitulo com voce.",
+        phrase: "Cada detalhe da nossa história nos trouxe até aqui. Agora queremos celebrar esse novo capítulo com você.",
       },
     },
     {
       kind: "historia",
       enabled: true,
-      fields: { title: "Nossa historia", text: "Conte aqui como tudo comecou.", note: "E foi aqui que tudo mudou." },
+      fields: { title: "Nossa história", text: "Conte aqui como tudo começou.", note: "E foi aqui que tudo mudou." },
     },
-    { kind: "evento", enabled: true, fields: { title: "Quando e onde", text: "Esperamos voce para celebrar com a gente." } },
+    { kind: "evento", enabled: true, fields: { title: "Quando e onde", text: "Esperamos você para celebrar com a gente." } },
     {
       kind: "presentes",
       enabled: true,
@@ -80,7 +80,7 @@ export function defaultInvitationPages(coupleNames: string): InvitationPage[] {
         step1: "Escolha um presente da nossa lista.",
         step2: "Confirme a sua escolha.",
         optionOnline: "Prefere comprar pela lista on-line? Acesse o link e escolha seu presente.",
-        optionFree: "Prefere escolher por conta propria? Leve seu presente no dia da festa.",
+        optionFree: "Prefere escolher por conta própria? Leve seu presente no dia da festa.",
         button: "Acessar lista de presentes",
         note: "Um pedacinho do nosso novo lar.",
       },
@@ -88,12 +88,12 @@ export function defaultInvitationPages(coupleNames: string): InvitationPage[] {
     {
       kind: "rsvp",
       enabled: true,
-      fields: { title: "Confirme sua presenca", text: "Sua resposta nos ajuda a preparar tudo com carinho.", button: "Confirmar presenca" },
+      fields: { title: "Confirme sua presença", text: "Sua resposta nos ajuda a preparar tudo com carinho.", button: "Confirmar presença" },
     },
     {
       kind: "encerramento",
       enabled: true,
-      fields: { title: "Nos vemos la!", text: "Com carinho,", signature: coupleNames },
+      fields: { title: "Nos vemos lá!", text: "Com carinho,", signature: coupleNames },
     },
   ];
 }
@@ -103,9 +103,9 @@ export type SiteSectionKey = "historia" | "eventos" | "rsvp" | "presentes" | "ga
 export type SiteSection = { key: SiteSectionKey; enabled: boolean };
 
 export const SECTION_LABELS: Record<SiteSectionKey, string> = {
-  historia: "Nossa historia",
+  historia: "Nossa história",
   eventos: "Quando e onde",
-  rsvp: "Confirmacao de presenca",
+  rsvp: "Confirmação de presença",
   presentes: "Lista de presentes",
   galeria: "Galeria de fotos",
 };

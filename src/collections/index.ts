@@ -26,7 +26,7 @@ export const COLLECTIONS: Collection[] = [
   {
     key: "cereja",
     name: "Cereja",
-    mood: "Papel creme, vermelho-cereja e folhas oliva. Romantica e editorial.",
+    mood: "Papel creme, vermelho-cereja e folhas oliva. Romântica e editorial.",
     ornament: "cereja",
     palette: {
       bg: "#efe6da",
@@ -85,13 +85,13 @@ export type FontPairKey = "classica" | "romantica" | "moderna";
 // As variaveis CSS sao definidas em src/app/layout.tsx (next/font).
 export const FONT_PAIRS: Record<FontPairKey, { name: string; display: string; script: string; body: string }> = {
   classica: {
-    name: "Classica",
+    name: "Clássica",
     display: "var(--font-cormorant)",
     script: "var(--font-pinyon)",
     body: "var(--font-cormorant)",
   },
   romantica: {
-    name: "Romantica",
+    name: "Romântica",
     display: "var(--font-cormorant)",
     script: "var(--font-greatvibes)",
     body: "var(--font-cormorant)",
