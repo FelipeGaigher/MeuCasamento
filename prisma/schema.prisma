@@ -5,9 +5,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// DATABASE_URL e o pooled do Neon (-pooler), usado pela app. Migracao usa a
+// conexao direta (DATABASE_URL_UNPOOLED): o PgBouncer em modo transacao quebra
+// o Prisma Migrate.
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 enum MemberRole {
