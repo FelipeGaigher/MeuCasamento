@@ -1,0 +1,295 @@
+// Toda tabela de negocio tem weddingId: o casamento e o tenant.
+// Excecoes ficam na allowlist de tests/tenancy.test.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberRole {
+  OWNER
+  EDITOR
+}
+
+enum WeddingStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EventKind {
+  CERIMONIA
+  RECEPCAO
+  NOIVADO
+  CHA
+  OUTRO
+}
+
+enum RsvpStatus {
+  PENDENTE
+  CONFIRMADO
+  RECUSADO
+}
+
+enum GiftKind {
+  COTA
+  PRODUTO
+}
+
+enum OrderStatus {
+  PENDENTE
+  PAGO
+  CANCELADO
+  ESTORNADO
+}
+
+enum PaymentMethod {
+  PIX
+  CARTAO
+}
+
+enum PayoutStatus {
+  PENDENTE
+  EM_ANALISE
+  ATIVA
+  RECUSADA
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  EMAIL
+}
+
+enum NotificationKind {
+  PEDIDO_PAGO
+  RSVP
+}
+
+enum NotificationStatus {
+  ENVIADA
+  FALHOU
+  IGNORADA
+}
+
+// --- Fora do tenant (allowlist) ---
+
+model User {
+  id           String          @id @default(cuid())
+  email        String          @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime        @default(now())
+  memberships  WeddingMember[]
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  provider  String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  @@unique([provider, eventId])
+}
+
+// --- Tenant ---
+
+model Wedding {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  coupleNames String
+  status      WeddingStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Para onde vao os avisos do casal
+  notifyPhone   String?
+  notifyEmail   String?
+  notifyOnOrder Boolean @default(true)
+  notifyOnRsvp  Boolean @default(true)
+
+  members       WeddingMember[]
+  events        Event[]
+  site          SiteSettings?
+  invitation    Invitation?
+  guests        Guest[]
+  rsvps         Rsvp[]
+  gifts         Gift[]
+  orders        Order[]
+  orderItems    OrderItem[]
+  payout        PayoutAccount?
+  notifications Notification[]
+}
+
+model WeddingMember {
+  id        String     @id @default(cuid())
+  weddingId String
+  userId    String
+  role      MemberRole @default(OWNER)
+  wedding   Wedding    @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([weddingId, userId])
+}
+
+// Fonte unica de data, horario e local: convite, site e lembretes leem daqui.
+model Event {
+  id        String    @id @default(cuid())
+  weddingId String
+  kind      EventKind @default(CERIMONIA)
+  title     String
+  startsAt  DateTime
+  venueName String
+  address   String
+  mapsUrl   String?
+  dressCode String?
+  notes     String?
+  order     Int       @default(0)
+  wedding   Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+}
+
+model SiteSettings {
+  id            String   @id @default(cuid())
+  weddingId     String   @unique
+  collectionKey String   @default("cereja")
+  fontPairKey   String   @default("classica")
+  // [{ key: "historia", enabled: true }, ...] na ordem de exibicao
+  sections      Json
+  heroTitle     String?
+  heroSubtitle  String?
+  story         String?
+  heroImageUrl  String?
+  updatedAt     DateTime @updatedAt
+  wedding       Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+}
+
+model Invitation {
+  id            String    @id @default(cuid())
+  weddingId     String    @unique
+  collectionKey String    @default("cereja")
+  // [{ kind: "capa", enabled: true, fields: {...} }, ...]
+  pages         Json
+  publishedAt   DateTime?
+  updatedAt     DateTime  @updatedAt
+  wedding       Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+}
+
+model Guest {
+  id            String   @id @default(cuid())
+  weddingId     String
+  name          String
+  household     String?
+  phone         String?
+  email         String?
+  maxCompanions Int      @default(0)
+  group         String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  wedding       Wedding  @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  rsvp          Rsvp?
+
+  @@index([weddingId])
+}
+
+model Rsvp {
+  id          String     @id @default(cuid())
+  weddingId   String
+  guestId     String     @unique
+  status      RsvpStatus @default(PENDENTE)
+  adults      Int        @default(1)
+  children    Int        @default(0)
+  message     String?
+  respondedAt DateTime?
+  wedding     Wedding    @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  guest       Guest      @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+}
+
+model Gift {
+  id          String      @id @default(cuid())
+  weddingId   String
+  title       String
+  description String?
+  imageUrl    String?
+  priceCents  Int
+  kind        GiftKind    @default(COTA)
+  storeUrl    String?
+  // null = sem limite (cota); numero = quantas unidades o casal quer
+  quantity    Int?
+  active      Boolean     @default(true)
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  wedding     Wedding     @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+
+  @@index([weddingId])
+}
+
+model Order {
+  id           String        @id @default(cuid())
+  weddingId    String
+  number       Int
+  buyerName    String
+  buyerEmail   String
+  message      String?
+  totalCents   Int
+  feeCents     Int
+  coupleCents  Int
+  status       OrderStatus   @default(PENDENTE)
+  method       PaymentMethod @default(PIX)
+  gatewayId    String?       @unique
+  pixCopyPaste String?
+  pixQrBase64  String?
+  paidAt       DateTime?
+  createdAt    DateTime      @default(now())
+  wedding      Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  items        OrderItem[]
+
+  @@unique([weddingId, number])
+  @@index([weddingId, status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  weddingId String
+  orderId   String
+  giftId    String
+  title     String
+  unitCents Int
+  quantity  Int     @default(1)
+  wedding   Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  gift      Gift    @relation(fields: [giftId], references: [id], onDelete: Restrict)
+
+  @@index([weddingId])
+}
+
+// Subconta Asaas do casal. So o walletId: a chave da subconta nunca e guardada.
+model PayoutAccount {
+  id             String       @id @default(cuid())
+  weddingId      String       @unique
+  asaasAccountId String?
+  walletId       String?
+  status         PayoutStatus @default(PENDENTE)
+  updatedAt      DateTime     @updatedAt
+  wedding        Wedding      @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+}
+
+// Historico de avisos. Nao guarda telefone, e-mail nem texto da mensagem.
+model Notification {
+  id        String              @id @default(cuid())
+  weddingId String
+  channel   NotificationChannel
+  kind      NotificationKind
+  status    NotificationStatus
+  error     String?
+  createdAt DateTime            @default(now())
+  wedding   Wedding             @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId, createdAt])
+}
