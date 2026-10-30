@@ -1,96 +1,103 @@
 import Link from "next/link";
-import { CalendarCheck, Gift, MonitorSmartphone, PenLine, Type, Wallet } from "lucide-react";
 import { COLLECTIONS } from "@/collections";
 import { CollectionCard } from "@/components/landing/CollectionCard";
 import { Faq } from "@/components/landing/Faq";
+import { InviteTryout } from "@/components/landing/InviteTryout";
 import { ButtonLink } from "@/components/ui";
+import { formatBRL } from "@/lib/money";
+import { computeSplit, splitConfigFromEnv } from "@/lib/split";
+
+// Casamento de demonstracao do seed (prisma/seed.ts).
+const DEMO_SLUG = "ana-e-pedro";
 
 const STEPS = [
-  { n: "01", title: "Conte a história e escolha o estilo", text: "Nome do casal, data, local e um pouco de vocês. Escolha a coleção que tem a cara do casamento." },
-  { n: "02", title: "Revise os textos", text: "Os textos ficam num formulário, não dentro de uma imagem. O que vocês escrevem é exatamente o que o convidado lê." },
-  { n: "03", title: "Compartilhe", text: "Um link só para o convite, o site, a confirmação de presença e a lista de presentes. Pronto para o WhatsApp." },
+  { title: "Conte a história e escolha o estilo", text: "Nome do casal, data, local e um pouco de vocês. A coleção veste o convite e o site juntos." },
+  { title: "Revise os textos", text: "Os textos ficam num formulário, não dentro de uma imagem. O que vocês escrevem é o que o convidado lê." },
+  { title: "Mande o link", text: "Um link só leva ao convite, ao site, à confirmação de presença e à lista de presentes." },
 ];
 
-const PAINS = [
-  { icon: Type, title: "Texto de verdade, não imagem", text: "Nada de frase cortada ou palavra trocada pela arte. O texto é editável até o último dia." },
-  { icon: MonitorSmartphone, title: "Bonito no celular e no computador", text: "O convite se adapta à tela. Nada de arte esticada nem botão que some." },
-  { icon: CalendarCheck, title: "Dados do evento num lugar só", text: "Data, horário e local são cadastrados uma vez e aparecem iguais no convite, no site e nos lembretes." },
-  { icon: PenLine, title: "Confirmação em destaque", text: "A resposta do convidado é a ação principal, com link pessoal para cada família." },
-  { icon: Wallet, title: "Presente em dinheiro direto para o casal", text: "O convidado escolhe o presente e paga no Pix. O valor cai na conta de vocês." },
-  { icon: Gift, title: "Lista montada sem caçar link", text: "Cadastre cotas e produtos num só lugar e acompanhe cada presente recebido." },
+// O que o casal faz hoje e como fica aqui. Cada linha e uma dor real de quem ja casou.
+const BEFORE_AFTER: [string, string][] = [
+  ["Convite feito num editor de imagem. Errou a data, refaz a arte.", "Data, horário e local cadastrados uma vez. Mudou, o convite e o site mudam juntos."],
+  ["Confirmação de presença numa planilha, preenchida a partir de mensagens no WhatsApp.", "Cada família recebe um link próprio e responde em um toque. A lista se atualiza sozinha."],
+  ["Lista de presentes em outro site, separada do convite.", "O convidado escolhe o presente no mesmo link, paga no Pix e o valor cai na conta de vocês."],
+  ["Texto do convite cortado ou ilegível no celular.", "Texto de verdade, que se ajusta à tela do celular e do computador."],
 ];
+
+const EXAMPLES = [100_00, 250_00, 500_00];
 
 export default function Home() {
+  const cfg = splitConfigFromEnv();
+  const pct = (cfg.feeBps / 100).toLocaleString("pt-BR");
+
   return (
     <div className="bg-canvas">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <Link href="/" className="font-serif text-2xl text-brand">Meu Casamento</Link>
         <nav className="flex items-center gap-2">
-          <Link href="/entrar" className="t-label px-3 py-2 text-muted hover:text-ink">Entrar</Link>
+          <Link href="/entrar" className="t-action px-3 py-2 text-muted hover:text-ink">Entrar</Link>
           <ButtonLink href="/criar">Criar grátis</ButtonLink>
         </nav>
       </header>
 
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-8 pb-16 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-6 pb-16 sm:px-8 lg:grid-cols-[1.15fr_1fr] lg:pt-14">
         <div>
-          <p className="t-label uppercase tracking-[0.2em] text-brand">Convite · Site · Confirmação · Presentes</p>
-          <h1 className="t-display mt-4 text-ink">Convite, site, confirmação e lista de presentes num lugar só.</h1>
+          <h1 className="t-display text-ink">Convite, site, confirmação e lista de presentes num lugar só.</h1>
           <p className="t-body mt-5 max-w-xl text-muted">
-            Vocês contam a história e escolhem o estilo. A gente entrega tudo pronto e ligado: o convite abre bem em
-            qualquer tela, o convidado confirma em um toque e o presente cai direto na conta do casal.
+            Vocês contam a história e escolhem o estilo. O convite abre bem em qualquer tela, o convidado confirma em um
+            toque e o presente cai direto na conta do casal.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href="/criar" className="h-12 px-6">Criar meu casamento</ButtonLink>
-            <ButtonLink href="#como-funciona" variant="secondary" className="h-12 px-6">Como funciona</ButtonLink>
+            <ButtonLink href="/criar" size="lg">Criar meu casamento</ButtonLink>
+            <ButtonLink href={`/${DEMO_SLUG}`} variant="secondary" size="lg">Ver um casamento de exemplo</ButtonLink>
           </div>
-          <p className="t-meta mt-4">Grátis para começar. Sem cartão de crédito.</p>
+          <p className="t-meta mt-4">Grátis para montar e publicar. Sem cartão de crédito.</p>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="translate-y-6"><CollectionCard collection={COLLECTIONS[0]} /></div>
-          <CollectionCard collection={COLLECTIONS[1]} names="Júlia & Rafa" />
-        </div>
+        <InviteTryout />
       </section>
 
       <section id="como-funciona" className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-          <h2 className="t-headline text-ink">Como funciona</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.n} className="rounded-xl border border-line bg-canvas p-6">
-                <p className="t-headline text-brand">{s.n}</p>
-                <p className="t-section mt-3">{s.title}</p>
+          <h2 className="t-headline">Como funciona</h2>
+          <ol className="mt-8 grid gap-8 md:grid-cols-3 md:gap-10">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="border-t-2 border-brand pt-4">
+                <p className="t-group text-brand">Passo {i + 1}</p>
+                <p className="t-section mt-1">{s.title}</p>
                 <p className="t-body mt-2 text-muted">{s.text}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-        <h2 className="t-headline text-ink">O que deixa de dar dor de cabeça</h2>
-        <p className="t-body mt-2 max-w-2xl text-muted">
-          Montar convite num editor de imagem, lista em outro site e confirmação numa planilha dá trabalho e confunde o convidado.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PAINS.map(({ icon: Icon, title, text }) => (
-            <div key={title} className="rounded-xl border border-line bg-surface p-5">
-              <Icon className="size-5 text-brand" aria-hidden />
-              <p className="t-item mt-3">{title}</p>
-              <p className="t-body mt-1 text-muted">{text}</p>
-            </div>
-          ))}
+        <h2 className="t-headline">O que muda para vocês</h2>
+        <div className="mt-8 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+          <div className="hidden grid-cols-2 border-b border-line bg-canvas md:grid">
+            <p className="t-group px-5 py-3">Como costuma ser</p>
+            <p className="t-group px-5 py-3 text-brand">No Meu Casamento</p>
+          </div>
+          <ul className="divide-y divide-line">
+            {BEFORE_AFTER.map(([before, after]) => (
+              <li key={before} className="grid md:grid-cols-2">
+                <p className="t-body px-5 pt-4 text-muted md:py-4">{before}</p>
+                <p className="t-body px-5 pt-1 pb-4 text-ink md:py-4">{after}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       <section className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-          <h2 className="t-headline text-ink">Coleções</h2>
+          <h2 className="t-headline">Coleções</h2>
           <p className="t-body mt-2 max-w-2xl text-muted">Cada coleção veste o convite e o site ao mesmo tempo. Troque quando quiser.</p>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {COLLECTIONS.map((c) => (
               <div key={c.key}>
                 <CollectionCard collection={c} />
-                <p className="t-item mt-3">{c.name}</p>
+                <p className="t-section mt-3">{c.name}</p>
                 <p className="t-body text-muted">{c.mood}</p>
               </div>
             ))}
@@ -98,42 +105,59 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-        <h2 className="t-headline text-ink">Preço</h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-line bg-surface p-6">
-            <p className="t-section">Grátis</p>
-            <p className="t-body mt-2 text-muted">Site do casamento, convite digital e confirmação de presença, sem limite de convidados.</p>
-          </div>
-          <div className="rounded-xl border-2 border-brand bg-brand-soft p-6">
-            <p className="t-section text-brand">3,5% por presente</p>
-            <p className="t-body mt-2 text-ink">Cobrado só quando um presente é pago no Pix, com mínimo de R$ 3 por presente. O resto vai para o casal.</p>
-          </div>
-          <div className="rounded-xl border border-line bg-surface p-6">
-            <p className="t-section">Coleções premium</p>
-            <p className="t-body mt-2 text-muted">Em breve: coleções exclusivas e arte personalizada a partir da história de vocês.</p>
-          </div>
+      <section className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+        <div>
+          <h2 className="t-headline">Preço</h2>
+          <p className="t-body mt-3 max-w-md text-muted">
+            Convite, site e confirmação de presença são grátis, sem limite de convidados. Cobramos {pct}% só quando um
+            presente é pago no Pix, com mínimo de {formatBRL(cfg.minFeeCents)} por presente.
+          </p>
         </div>
+        <table className="w-full overflow-hidden rounded-2xl bg-surface shadow-card">
+          <caption className="sr-only">Quanto o casal recebe por presente</caption>
+          <thead>
+            <tr className="border-b border-line bg-canvas text-left">
+              <th scope="col" className="t-group px-5 py-3">Presente</th>
+              <th scope="col" className="t-group px-5 py-3">Taxa</th>
+              <th scope="col" className="t-group px-5 py-3 text-brand">Vocês recebem</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {EXAMPLES.map((total) => {
+              const s = computeSplit(total, cfg);
+              return (
+                <tr key={total}>
+                  <td className="t-body px-5 py-3 tabular-nums">{formatBRL(s.totalCents)}</td>
+                  <td className="t-body px-5 py-3 text-muted tabular-nums">{formatBRL(s.feeCents)}</td>
+                  <td className="t-value px-5 py-3">{formatBRL(s.coupleCents)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </section>
 
       <section className="border-t border-line bg-surface">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8">
-          <h2 className="t-headline text-ink">Perguntas frequentes</h2>
+          <h2 className="t-headline">Perguntas frequentes</h2>
           <div className="mt-8"><Faq /></div>
         </div>
       </section>
 
       <section className="bg-brand">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-16 sm:px-8 md:flex-row md:items-center md:justify-between">
-          <h2 className="t-headline text-white">Comece hoje. Leva poucos minutos.</h2>
-          <Link href="/criar" className="t-label inline-flex h-12 items-center rounded-lg bg-white px-6 text-brand hover:bg-canvas">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-14 sm:px-8 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="t-headline text-white">Montem o convite hoje e mandem o link amanhã.</h2>
+            <p className="t-body mt-2 text-white/80">O cadastro pede o nome do casal, a data e o local. O convite já sai montado com eles.</p>
+          </div>
+          <Link href="/criar" className="t-action inline-flex h-12 shrink-0 items-center rounded-lg bg-white px-6 text-brand hover:bg-canvas">
             Criar meu casamento
           </Link>
         </div>
       </section>
 
       <footer className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-        <p className="t-meta">© {new Date().getFullYear()} Meu Casamento</p>
+        <p className="t-meta">Meu Casamento, {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

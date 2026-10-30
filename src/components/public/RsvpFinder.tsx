@@ -10,17 +10,34 @@ type Result = { token: string; name: string; household: string | null; limit: nu
 export function RsvpFinder({ slug }: { slug: string }) {
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Result[] | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [chosen, setChosen] = useState<Result | null>(null);
 
   useEffect(() => {
+    setError(null);
     if (q.trim().length < 3) {
       setResults(null);
+      setSearching(false);
       return;
     }
+    setSearching(true);
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       const res = await fetch(`/api/public/${slug}/rsvp?q=${encodeURIComponent(q)}`, { signal: ctrl.signal }).catch(() => null);
-      if (res?.ok) setResults((await res.json()).results);
+      if (ctrl.signal.aborted) return;
+      setSearching(false);
+      if (res?.ok) {
+        setResults((await res.json()).results);
+        return;
+      }
+      // Sem conexao ou erro do servidor: o convidado precisa saber que a busca nao rodou.
+      setResults(null);
+      setError(
+        res
+          ? ((await res.json().catch(() => null))?.error ?? "Não conseguimos buscar agora. Tente de novo em instantes.")
+          : "Sem conexão. Confira a internet e tente de novo.",
+      );
     }, 300);
     return () => {
       clearTimeout(t);
@@ -45,7 +62,15 @@ export function RsvpFinder({ slug }: { slug: string }) {
         <span className={pub.label}>Digite seu nome como está no convite</span>
         <input className={pub.input} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ex.: Mariana Costa" autoComplete="name" />
       </label>
-      {results && results.length === 0 && (
+      <p className={pub.muted} role="status" aria-live="polite">
+        {searching ? "Procurando seu nome..." : q.trim().length > 0 && q.trim().length < 3 ? "Digite pelo menos 3 letras." : ""}
+      </p>
+      {error && (
+        <p className="text-base text-[var(--w-accent)] [font-family:var(--w-body)]" role="alert">
+          {error}
+        </p>
+      )}
+      {!searching && results && results.length === 0 && (
         <p className={pub.muted}>Não encontramos esse nome. Confira a grafia ou fale com o casal.</p>
       )}
       {results && results.length > 0 && (
