@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Great_Vibes, Inter, Pinyon_Script, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+// Fontes locais (src/app/fonts): o build nao depende do Google Fonts.
+const inter = localFont({ src: "./fonts/inter-latin-wght-normal.woff2", weight: "100 900", variable: "--font-inter", display: "swap" });
+const cormorant = localFont({
+  src: [
+    { path: "./fonts/cormorant-garamond-latin-wght-normal.woff2", weight: "300 700", style: "normal" },
+    { path: "./fonts/cormorant-garamond-latin-wght-italic.woff2", weight: "300 700", style: "italic" },
+  ],
   variable: "--font-cormorant",
   display: "swap",
 });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair", display: "swap" });
-const pinyon = Pinyon_Script({ subsets: ["latin"], weight: "400", variable: "--font-pinyon", display: "swap" });
-const greatVibes = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-greatvibes", display: "swap" });
+const playfair = localFont({ src: "./fonts/playfair-display-latin-wght-normal.woff2", weight: "400 900", variable: "--font-playfair", display: "swap" });
+const pinyon = localFont({ src: "./fonts/pinyon-script-latin-400-normal.woff2", weight: "400", variable: "--font-pinyon", display: "swap" });
+const greatVibes = localFont({ src: "./fonts/great-vibes-latin-400-normal.woff2", weight: "400", variable: "--font-greatvibes", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Meu Casamento", template: "%s · Meu Casamento" },
