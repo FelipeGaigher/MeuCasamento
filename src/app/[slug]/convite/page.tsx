@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { readPages } from "@/collections/content";
 import { InvitationView } from "@/components/site/InvitationView";
+import { CmsCopyProvider } from "@/components/cms/CmsCopyProvider";
 import { loadPublicWedding, shareDescription, shareTitle } from "@/components/site/data";
+import { canEditWedding } from "@/server/auth/current";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -27,7 +29,7 @@ export default async function InvitationPage({ params }: Params) {
   const data = await loadPublicWedding(slug);
   if (!data) notFound();
   const { wedding, events } = data;
-  return (
+  const view = (
     <main>
       <InvitationView
         slug={slug}
@@ -38,5 +40,12 @@ export default async function InvitationPage({ params }: Params) {
         fontPairKey={wedding.site?.fontPairKey}
       />
     </main>
+  );
+  // O casal logado edita os textos direto aqui (tecla E).
+  if (!(await canEditWedding(wedding.id))) return view;
+  return (
+    <CmsCopyProvider mode="inline" slug={slug}>
+      {view}
+    </CmsCopyProvider>
   );
 }

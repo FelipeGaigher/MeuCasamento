@@ -11,4 +11,4 @@ export async function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/painel/:path*"] };
+export const config = { matcher: ["/painel/:path*", "/previa/:path*"] };

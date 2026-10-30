@@ -15,20 +15,48 @@
   --color-warn-soft: #fbf0dc;
   --color-danger: #a42a2a;
   --color-danger-soft: #fbe9e9;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-poppins), system-ui, sans-serif;
   --font-serif: var(--font-cormorant), Georgia, serif;
+
+  /* Elevacao (mesma escala da Flovi e da Nautica): cartao, hover/menu, flutuante. */
+  --shadow-card: 0 1px 3px rgba(42, 32, 35, 0.06), 0 1px 2px rgba(42, 32, 35, 0.04);
+  --shadow-elevated: 0 4px 12px rgba(42, 32, 35, 0.08), 0 2px 4px rgba(42, 32, 35, 0.04);
+  --shadow-float: 0 12px 40px rgba(42, 32, 35, 0.12), 0 4px 12px rgba(42, 32, 35, 0.06);
 }
 
-/* Texto por papel, nunca por tamanho solto. */
-@utility t-display { font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.05; font-weight: 500; letter-spacing: -0.01em; }
-@utility t-page { font-size: 1.5rem; line-height: 2rem; font-weight: 600; letter-spacing: -0.01em; }
-@utility t-section { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; }
-@utility t-item { font-size: 0.9375rem; line-height: 1.375rem; font-weight: 600; }
-@utility t-body { font-size: 0.9375rem; line-height: 1.5rem; font-weight: 400; }
-@utility t-label { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 500; }
-@utility t-meta { font-size: 0.8125rem; line-height: 1.25rem; font-weight: 400; color: var(--color-muted); }
-@utility t-value { font-size: 1.5rem; line-height: 2rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Texto por papel, nunca por tamanho solto. Escala 11/12/13/14/16/20/24, peso maximo 600
+   (Poppins em negrito fica grosseira). Mesmos papeis da Nautica. */
+@utility t-display { font-size: clamp(2.25rem, 5vw, 3.5rem); line-height: 1.1; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+@utility t-headline { font-size: 2rem; line-height: 2.5rem; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+@utility t-page { font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+@utility t-section { font-size: 1rem; line-height: 1.5rem; font-weight: 600; }
+@utility t-item { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+@utility t-action { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+@utility t-body { font-size: 0.875rem; line-height: 1.375rem; font-weight: 400; }
+@utility t-label { font-size: 0.8125rem; line-height: 1.125rem; font-weight: 500; }
+@utility t-meta { font-size: 0.75rem; line-height: 1rem; font-weight: 400; color: var(--color-muted); }
+@utility t-group { font-size: 0.6875rem; line-height: 1rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); }
+@utility t-chip { font-size: 0.6875rem; line-height: 1rem; font-weight: 500; }
+@utility t-value { font-size: 1rem; line-height: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+@utility t-result { font-size: 1.5rem; line-height: 1.875rem; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 
 html { -webkit-text-size-adjust: 100%; }
-body { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+body { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, b, strong, th { font-weight: 600; }
+
+/* Barra de rolagem fina, igual nos sistemas da casa. */
+* { scrollbar-width: thin; scrollbar-color: var(--color-line) transparent; }
+
+/* Painel: campo que a previa mandou focar (clique num texto do iframe). */
+.is-cms-focused { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 30%, transparent); transition: box-shadow 0.3s; }
+
+/* Paginas do casal: texto editavel na previa e na edicao direto na pagina. */
+.cms-preview [data-cms-path] { cursor: pointer; }
+.cms-preview [data-cms-path]:hover { outline: 1px dashed color-mix(in srgb, var(--w-accent) 70%, transparent); outline-offset: 3px; }
+.is-cms-picked { outline: 2px solid var(--w-accent) !important; outline-offset: 3px; }
+.cms-editing [data-cms-path] { outline: 1px dashed color-mix(in srgb, var(--w-accent) 55%, transparent); outline-offset: 3px; cursor: text; }
+.cms-editing [data-cms-path]:hover { outline-color: var(--w-accent); }
+.cms-editing [data-cms-path]:focus { outline: 2px solid var(--w-accent); }
+.cms-editing [data-cms-path]:empty::before { content: "Escreva aqui"; opacity: 0.45; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 :focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }

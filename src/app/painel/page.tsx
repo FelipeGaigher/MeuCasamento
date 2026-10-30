@@ -4,7 +4,7 @@ import { db } from "@/server/db";
 import { requireWedding } from "@/server/auth/current";
 import { Badge, Card, Figure, PageHeader, buttonClass } from "@/components/ui";
 import { formatBRL } from "@/lib/money";
-import { daysUntil, formatDateLong, formatDateTime } from "@/lib/dates";
+import { formatDateTime } from "@/lib/dates";
 
 const RSVP_TONE = { CONFIRMADO: "ok", RECUSADO: "danger", PENDENTE: "neutral" } as const;
 const RSVP_LABEL = { CONFIRMADO: "Confirmou", RECUSADO: "Não vai", PENDENTE: "Pendente" } as const;
@@ -33,7 +33,6 @@ export default async function PainelPage() {
     ]);
 
   const people = (confirmed._sum.adults ?? 0) + (confirmed._sum.children ?? 0);
-  const days = firstEvent ? daysUntil(firstEvent.startsAt) : null;
 
   const steps = [
     { done: !!firstEvent?.venueName && !!firstEvent?.address, label: "Cadastrar data, horário e local", href: "/painel/evento" },
@@ -48,10 +47,10 @@ export default async function PainelPage() {
   return (
     <>
       <PageHeader
-        title={wedding.coupleNames}
+        title="Visão geral"
         description={
           firstEvent
-            ? `${formatDateLong(firstEvent.startsAt)}${days !== null && days >= 0 ? ` · faltam ${days} ${days === 1 ? "dia" : "dias"}` : ""}`
+            ? `${doneCount} de ${steps.length} passos feitos para o casamento ficar pronto.`
             : "Cadastre a data do evento para começar."
         }
         actions={

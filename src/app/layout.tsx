@@ -3,6 +3,18 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 // Fontes locais (src/app/fonts): o build nao depende do Google Fonts.
+// Poppins e a fonte do sistema (LP, cadastro e painel). As demais vestem o convite e o site do casal.
+const poppins = localFont({
+  src: [
+    { path: "./fonts/poppins-latin-300-normal.woff2", weight: "300", style: "normal" },
+    { path: "./fonts/poppins-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/poppins-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/poppins-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/poppins-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-poppins",
+  display: "swap",
+});
 const inter = localFont({ src: "./fonts/inter-latin-wght-normal.woff2", weight: "100 900", variable: "--font-inter", display: "swap" });
 const cormorant = localFont({
   src: [
@@ -24,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${cormorant.variable} ${playfair.variable} ${pinyon.variable} ${greatVibes.variable}`}>
+    <html lang="pt-BR" className={`${poppins.variable} ${inter.variable} ${cormorant.variable} ${playfair.variable} ${pinyon.variable} ${greatVibes.variable}`}>
       <body>{children}</body>
     </html>
   );

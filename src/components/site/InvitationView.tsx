@@ -1,5 +1,6 @@
 import { getCollection, themeVars } from "@/collections";
-import type { InvitationPage } from "@/collections/content";
+import type { InvitationPage, InvitationPageKind } from "@/collections/content";
+import { cmsAttrs, cmsBox } from "@/lib/cms";
 import { cn } from "@/lib/cn";
 import { formatDateLong, formatTime } from "@/lib/dates";
 import { Ornament, type OrnamentKind } from "./Ornaments";
@@ -17,10 +18,10 @@ type Props = {
   pages: InvitationPage[];
   collectionKey: string;
   fontPairKey?: string | null;
-  preview?: boolean;
 };
 
 type PageProps = {
+  page: InvitationPageKind;
   fields: Record<string, string>;
   slug: string;
   coupleNames: string;
@@ -31,36 +32,41 @@ type PageProps = {
 const display: React.CSSProperties = { fontFamily: "var(--w-display)" };
 const script: React.CSSProperties = { fontFamily: "var(--w-script)" };
 
-function Kicker({ children }: { children: React.ReactNode }) {
+type Cms = Record<string, string | boolean>;
+
+// Caminho do campo para o preview e a edicao na pagina: pages.<pagina>.<campo>
+const at = (page: InvitationPageKind, key: string) => `pages.${page}.${key}`;
+
+function Kicker({ children, cms }: { children: React.ReactNode; cms?: Cms }) {
   return (
-    <p className="text-[0.9375rem] uppercase tracking-[0.32em]" style={{ ...display, color: "var(--w-muted)" }}>
+    <p {...cms} className="text-[0.9375rem] uppercase tracking-[0.32em]" style={{ ...display, color: "var(--w-muted)" }}>
       {children}
     </p>
   );
 }
 
-function Title({ children }: { children: React.ReactNode }) {
+function Title({ children, cms }: { children: React.ReactNode; cms?: Cms }) {
   return (
-    <h2 className="text-[2rem] leading-tight uppercase tracking-[0.06em] sm:text-[2.375rem]" style={{ ...display, color: "var(--w-accent)", fontWeight: 500 }}>
+    <h2 {...cms} className="text-[2rem] leading-tight uppercase tracking-[0.06em] sm:text-[2.375rem]" style={{ ...display, color: "var(--w-accent)", fontWeight: 500 }}>
       {children}
     </h2>
   );
 }
 
-function Body({ children, className }: { children: React.ReactNode; className?: string }) {
+function Body({ children, className, cms }: { children: React.ReactNode; className?: string; cms?: Cms }) {
   return (
-    <p className={cn("text-[1.125rem] leading-[1.7] whitespace-pre-line", className)} style={{ color: "var(--w-ink)" }}>
+    <p {...cms} className={cn("text-[1.125rem] leading-[1.7] whitespace-pre-line", className)} style={{ color: "var(--w-ink)" }}>
       {children}
     </p>
   );
 }
 
-function Capa({ fields, coupleNames, events, kind }: PageProps) {
+function Capa({ page, fields, coupleNames, events, kind }: PageProps) {
   const [first, second] = splitNames(coupleNames);
   const e = events[0];
   return (
     <div className="px-7 pt-16 pb-10 text-center sm:px-12">
-      {fields.kicker && <Kicker>{fields.kicker}</Kicker>}
+      <Kicker cms={cmsAttrs(at(page, "kicker"), fields.kicker, { optional: true })}>{fields.kicker}</Kicker>
       <h1 className="mt-6 leading-[0.95]" style={{ ...script, color: "var(--w-accent)", fontSize: "clamp(3.25rem, 13vw, 4.75rem)" }}>
         <span className="block">{first}</span>
         {second && <span className="block">{second}</span>}
@@ -74,35 +80,33 @@ function Capa({ fields, coupleNames, events, kind }: PageProps) {
         </div>
       )}
       <Ornament kind={kind} slot="divider" className="mx-auto mt-8 h-6 w-40" />
-      {fields.phrase && <Body className="mx-auto mt-6 max-w-sm">{fields.phrase}</Body>}
+      <Body className="mx-auto mt-6 max-w-sm" cms={cmsAttrs(at(page, "phrase"), fields.phrase, { optional: true, multiline: true })}>{fields.phrase}</Body>
       <Ornament kind={kind} slot="seal" className="mx-auto mt-8 h-16 w-16" />
     </div>
   );
 }
 
-function Historia({ fields, kind }: PageProps) {
+function Historia({ page, fields, kind }: PageProps) {
   return (
     <div className="px-7 pt-14 pb-10 sm:px-12">
       <div className="text-center">
-        <Title>{fields.title}</Title>
+        <Title cms={cmsAttrs(at(page, "title"), fields.title)}>{fields.title}</Title>
         <Ornament kind={kind} slot="divider" className="mx-auto mt-4 h-6 w-40" />
       </div>
-      {fields.text && <Body className="mt-6">{fields.text}</Body>}
-      {fields.note && (
-        <p className="mt-8 text-right text-[1.75rem]" style={{ ...script, color: "var(--w-accent)" }}>
-          {fields.note}
-        </p>
-      )}
+      <Body className="mt-6" cms={cmsAttrs(at(page, "text"), fields.text, { optional: true, multiline: true })}>{fields.text}</Body>
+      <p {...cmsAttrs(at(page, "note"), fields.note, { optional: true })} className="mt-8 text-right text-[1.75rem]" style={{ ...script, color: "var(--w-accent)" }}>
+        {fields.note}
+      </p>
     </div>
   );
 }
 
-function Evento({ fields, events, kind }: PageProps) {
+function Evento({ page, fields, events, kind }: PageProps) {
   return (
     <div className="px-7 pt-14 pb-10 text-center sm:px-12">
-      <Title>{fields.title}</Title>
+      <Title cms={cmsAttrs(at(page, "title"), fields.title)}>{fields.title}</Title>
       <Ornament kind={kind} slot="divider" className="mx-auto mt-4 h-6 w-40" />
-      {fields.text && <Body className="mx-auto mt-5 max-w-sm">{fields.text}</Body>}
+      <Body className="mx-auto mt-5 max-w-sm" cms={cmsAttrs(at(page, "text"), fields.text, { optional: true, multiline: true })}>{fields.text}</Body>
       <ul className="mt-8 space-y-8">
         {events.map((e) => (
           <li key={e.id}>
@@ -130,88 +134,89 @@ function Evento({ fields, events, kind }: PageProps) {
   );
 }
 
-function Step({ n, children }: { n: string; children: React.ReactNode }) {
+function Step({ n, children, value, cms }: { n: string; children: React.ReactNode; value?: string; cms: Cms }) {
   return (
-    <div className="flex items-baseline gap-4 rounded-xl px-4 py-3" style={{ background: "color-mix(in srgb, var(--w-bg) 45%, var(--w-paper))" }}>
+    <div {...cmsBox(value)} className="flex items-baseline gap-4 rounded-xl px-4 py-3" style={{ background: "color-mix(in srgb, var(--w-bg) 45%, var(--w-paper))" }}>
       <span className="text-[1.75rem] leading-none" style={{ ...display, color: "var(--w-accent)", fontWeight: 600 }}>{n}</span>
-      <Body>{children}</Body>
+      <Body cms={cms}>{children}</Body>
     </div>
   );
 }
 
-function Option({ n, children }: { n: string; children: React.ReactNode }) {
+function Option({ n, children, value, cms }: { n: string; children: React.ReactNode; value?: string; cms: Cms }) {
   return (
-    <div className="flex flex-1 flex-col gap-2 rounded-xl px-4 py-4" style={{ border: "1px solid var(--w-line)", background: "var(--w-paper)" }}>
+    <div {...cmsBox(value)} className="flex flex-1 flex-col gap-2 rounded-xl px-4 py-4" style={{ border: "1px solid var(--w-line)", background: "var(--w-paper)" }}>
       <span className="text-[1.75rem] leading-none" style={{ ...display, color: "var(--w-accent)", fontWeight: 600 }}>{n}</span>
-      <Body>{children}</Body>
+      <Body cms={cms}>{children}</Body>
     </div>
   );
 }
 
-function Presentes({ fields, slug, kind }: PageProps) {
+// Campo opcional dentro de uma caixa que some junto com ele.
+const boxed = (page: InvitationPageKind, key: string, value?: string) =>
+  ({ value, cms: cmsAttrs(at(page, key), value, { optional: true, boxed: true, multiline: true }) });
+
+function Presentes({ page, fields, slug, kind }: PageProps) {
   return (
     <div className="px-6 pt-14 pb-10 sm:px-10">
       <div className="text-center">
-        <Title>{fields.title}</Title>
-        {fields.intro && <Body className="mx-auto mt-4 max-w-sm italic">{fields.intro}</Body>}
+        <Title cms={cmsAttrs(at(page, "title"), fields.title)}>{fields.title}</Title>
+        <Body className="mx-auto mt-4 max-w-sm italic" cms={cmsAttrs(at(page, "intro"), fields.intro, { optional: true, multiline: true })}>{fields.intro}</Body>
         <Ornament kind={kind} slot="divider" className="mx-auto mt-4 h-6 w-40" />
       </div>
       <div className="mt-6 space-y-3">
-        {fields.step1 && <Step n="01">{fields.step1}</Step>}
-        {fields.step2 && <Step n="02">{fields.step2}</Step>}
+        <Step n="01" {...boxed(page, "step1", fields.step1)}>{fields.step1}</Step>
+        <Step n="02" {...boxed(page, "step2", fields.step2)}>{fields.step2}</Step>
       </div>
       <div className="mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        {fields.optionOnline && <Option n="03">{fields.optionOnline}</Option>}
+        <Option n="03" {...boxed(page, "optionOnline", fields.optionOnline)}>{fields.optionOnline}</Option>
         {fields.optionOnline && fields.optionFree && (
           <span className="self-center text-[1.5rem]" style={{ ...script, color: "var(--w-accent)" }}>ou</span>
         )}
-        {fields.optionFree && <Option n="04">{fields.optionFree}</Option>}
+        <Option n="04" {...boxed(page, "optionFree", fields.optionFree)}>{fields.optionFree}</Option>
       </div>
-      {fields.button && (
-        <div className="mt-8 text-center">
-          <TagLink href={`/${slug}/presentes`}>{fields.button}</TagLink>
-        </div>
-      )}
-      {fields.note && (
-        <div className="mt-8 flex justify-center">
+      <div {...cmsBox(fields.button)} className="mt-8 text-center">
+        <TagLink href={`/${slug}/presentes`}>
+          <span {...cmsAttrs(at(page, "button"), fields.button, { optional: true, boxed: true })}>{fields.button}</span>
+        </TagLink>
+      </div>
+      <div {...cmsBox(fields.note)} className="mt-8 flex justify-center">
           <p
+            {...cmsAttrs(at(page, "note"), fields.note, { optional: true, boxed: true })}
             className="-rotate-1 px-6 py-2 text-[1.5rem]"
             style={{ ...script, background: "var(--w-accent)", color: "var(--w-accent-ink)", clipPath: "polygon(0 8%, 100% 0, 98% 100%, 2% 92%)" }}
           >
             {fields.note}
           </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
 
-function Rsvp({ fields, slug, kind }: PageProps) {
+function Rsvp({ page, fields, slug, kind }: PageProps) {
   return (
     <div className="px-7 pt-14 pb-12 text-center sm:px-12">
-      <Title>{fields.title}</Title>
+      <Title cms={cmsAttrs(at(page, "title"), fields.title)}>{fields.title}</Title>
       <Ornament kind={kind} slot="divider" className="mx-auto mt-4 h-6 w-40" />
-      {fields.text && <Body className="mx-auto mt-5 max-w-sm">{fields.text}</Body>}
-      {fields.button && (
-        <div className="mt-8">
-          <TagLink href={`/${slug}#confirmar`}>{fields.button}</TagLink>
-        </div>
-      )}
+      <Body className="mx-auto mt-5 max-w-sm" cms={cmsAttrs(at(page, "text"), fields.text, { optional: true, multiline: true })}>{fields.text}</Body>
+      <div {...cmsBox(fields.button)} className="mt-8">
+        <TagLink href={`/${slug}#confirmar`}>
+          <span {...cmsAttrs(at(page, "button"), fields.button, { optional: true, boxed: true })}>{fields.button}</span>
+        </TagLink>
+      </div>
     </div>
   );
 }
 
-function Encerramento({ fields, kind }: PageProps) {
+function Encerramento({ page, fields, kind }: PageProps) {
   return (
     <div className="px-7 pt-14 pb-10 text-center sm:px-12">
-      <Title>{fields.title}</Title>
+      <Title cms={cmsAttrs(at(page, "title"), fields.title)}>{fields.title}</Title>
       <Ornament kind={kind} slot="divider" className="mx-auto mt-4 h-6 w-40" />
-      {fields.text && <Body className="mx-auto mt-5 max-w-sm italic">{fields.text}</Body>}
-      {fields.signature && (
-        <p className="mt-3 text-[2.5rem] leading-tight" style={{ ...script, color: "var(--w-accent)" }}>
-          {fields.signature}
-        </p>
-      )}
+      <Body className="mx-auto mt-5 max-w-sm italic" cms={cmsAttrs(at(page, "text"), fields.text, { optional: true, multiline: true })}>{fields.text}</Body>
+      <p {...cmsAttrs(at(page, "signature"), fields.signature, { optional: true })} className="mt-3 text-[2.5rem] leading-tight" style={{ ...script, color: "var(--w-accent)" }}>
+        {fields.signature}
+      </p>
       <Ornament kind={kind} slot="seal" className="mx-auto mt-8 h-16 w-16" />
     </div>
   );
@@ -226,7 +231,7 @@ const RENDER = {
   encerramento: Encerramento,
 } as const;
 
-export function InvitationView({ slug, coupleNames, events, pages, collectionKey, fontPairKey, preview }: Props) {
+export function InvitationView({ slug, coupleNames, events, pages, collectionKey, fontPairKey }: Props) {
   const collection = getCollection(collectionKey);
   const kind = collection.ornament;
   const visible = pages.filter((p) => p.enabled);
@@ -238,23 +243,16 @@ export function InvitationView({ slug, coupleNames, events, pages, collectionKey
           <section
             key={page.kind}
             id={`pagina-${page.kind}`}
-            className={cn(
-              "relative flex justify-center overflow-x-clip px-4",
-              preview ? "py-8" : "min-h-dvh items-center py-12",
-            )}
+            className="relative flex min-h-dvh items-center justify-center overflow-x-clip px-4 py-12"
           >
-            {!preview && (
-              <>
-                <Ornament kind={kind} slot="side" className="absolute inset-y-10 left-[max(1rem,calc(50%-560px))] hidden w-48 lg:block" />
-                <Ornament kind={kind} slot="side" className="absolute inset-y-10 right-[max(1rem,calc(50%-560px))] hidden w-48 -scale-x-100 lg:block" />
-              </>
-            )}
+            <Ornament kind={kind} slot="side" className="absolute inset-y-10 left-[max(1rem,calc(50%-560px))] hidden w-48 lg:block" />
+            <Ornament kind={kind} slot="side" className="absolute inset-y-10 right-[max(1rem,calc(50%-560px))] hidden w-48 -scale-x-100 lg:block" />
             <div className="relative w-full max-w-[560px]">
               <Ornament kind={kind} slot="corner" className="absolute -top-8 -right-5 z-10 h-24 w-24 sm:-right-8 sm:h-28 sm:w-28" />
               <Paper>
-                <Render fields={page.fields} slug={slug} coupleNames={coupleNames} events={events} kind={kind} />
+                <Render page={page.kind} fields={page.fields} slug={slug} coupleNames={coupleNames} events={events} kind={kind} />
               </Paper>
-              {!preview && i === 0 && visible.length > 1 && (
+              {i === 0 && visible.length > 1 && (
                 <a
                   href={`#pagina-${visible[1].kind}`}
                   className="mx-auto mt-6 flex w-fit items-center gap-2 text-[1rem]"

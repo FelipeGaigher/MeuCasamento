@@ -9,6 +9,11 @@ A cobranca sai da conta Asaas da plataforma com split de valor fixo para a subco
 ## 2026-10-30: base a partir dos projetos existentes
 Padroes reaproveitados: adaptador Asaas e webhook idempotente (Checkout, Margot), Evolution e Brevo (Margot, Flovi), link de convidado assinado por HMAC e regra de tenant com teste (nautical-platform), conteudo + estilo intercambiavel (carrossel da Flovi). Nenhum repositorio foi copiado inteiro.
 
+## 2026-10-30: editor com previa e edicao na pagina
+Convite e Site e tema viraram editores com previa ao vivo (skill cms-preview, modo B: iframe da rota /previa/* + postMessage, como o editor de guia da Flovi). Estrutura (colecao, fontes, secoes, foto) vai na URL e recarrega a previa; texto vai por mensagem enquanto o casal digita. Nada salva ate o botao Salvar.
+O casal logado tambem edita os textos direto no site e no convite (skill cms-inline, variante por marcador no DOM): tecla E, Ctrl+S. Quem pode editar e decidido no servidor (membro do casamento). Em producao so liga com NEXT_PUBLIC_ENABLE_INLINE_CMS=true.
+Visual do painel no DS da Nautica e da Flovi (Poppins, papeis de texto, menu lateral com grupos, conteudo sem centralizar).
+
 ## Pendente
 - RLS no Postgres (hoje o isolamento e na aplicacao, coberto por teste de schema).
 - Geracao de arte por IA e importacao de presente por link (Fase 2).

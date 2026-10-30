@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "@/server/db";
+import { INLINE_CMS_ENABLED } from "@/lib/cms";
 import { getSession } from "./session";
 
 // Painel: devolve o usuario logado e o casamento dele. Toda consulta do painel
@@ -14,4 +15,14 @@ export async function requireWedding() {
   });
   if (!member) redirect("/criar");
   return { user: member.user, wedding: member.wedding, role: member.role };
+}
+
+// Pagina publica: o usuario logado e do casamento aberto? So entao a edicao
+// direto na pagina aparece. Decidido no servidor; o cliente recebe so o resultado.
+export async function canEditWedding(weddingId: string): Promise<boolean> {
+  if (!INLINE_CMS_ENABLED) return false;
+  const session = await getSession();
+  if (!session) return false;
+  const member = await db.weddingMember.findFirst({ where: { userId: session.sub, weddingId }, select: { id: true } });
+  return !!member;
 }

@@ -53,11 +53,11 @@ export default function Home() {
 
       <section id="como-funciona" className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-          <h2 className="font-serif text-4xl text-ink">Como funciona</h2>
+          <h2 className="t-headline text-ink">Como funciona</h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {STEPS.map((s) => (
               <div key={s.n} className="rounded-xl border border-line bg-canvas p-6">
-                <p className="font-serif text-4xl text-brand">{s.n}</p>
+                <p className="t-headline text-brand">{s.n}</p>
                 <p className="t-section mt-3">{s.title}</p>
                 <p className="t-body mt-2 text-muted">{s.text}</p>
               </div>
@@ -67,7 +67,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-        <h2 className="font-serif text-4xl text-ink">O que deixa de dar dor de cabeça</h2>
+        <h2 className="t-headline text-ink">O que deixa de dar dor de cabeça</h2>
         <p className="t-body mt-2 max-w-2xl text-muted">
           Montar convite num editor de imagem, lista em outro site e confirmação numa planilha dá trabalho e confunde o convidado.
         </p>
@@ -84,7 +84,7 @@ export default function Home() {
 
       <section className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-          <h2 className="font-serif text-4xl text-ink">Coleções</h2>
+          <h2 className="t-headline text-ink">Coleções</h2>
           <p className="t-body mt-2 max-w-2xl text-muted">Cada coleção veste o convite e o site ao mesmo tempo. Troque quando quiser.</p>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {COLLECTIONS.map((c) => (
@@ -99,7 +99,7 @@ export default function Home() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
-        <h2 className="font-serif text-4xl text-ink">Preço</h2>
+        <h2 className="t-headline text-ink">Preço</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-line bg-surface p-6">
             <p className="t-section">Grátis</p>
@@ -118,14 +118,14 @@ export default function Home() {
 
       <section className="border-t border-line bg-surface">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8">
-          <h2 className="font-serif text-4xl text-ink">Perguntas frequentes</h2>
+          <h2 className="t-headline text-ink">Perguntas frequentes</h2>
           <div className="mt-8"><Faq /></div>
         </div>
       </section>
 
       <section className="bg-brand">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-16 sm:px-8 md:flex-row md:items-center md:justify-between">
-          <h2 className="font-serif text-4xl text-white">Comece hoje. Leva poucos minutos.</h2>
+          <h2 className="t-headline text-white">Comece hoje. Leva poucos minutos.</h2>
           <Link href="/criar" className="t-label inline-flex h-12 items-center rounded-lg bg-white px-6 text-brand hover:bg-canvas">
             Criar meu casamento
           </Link>

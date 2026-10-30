@@ -14,7 +14,9 @@ Next.js 16 (App Router, server actions) + React 19 + Tailwind 4 + Prisma 6 (Post
 - Nunca guardar segredo, chave de API ou dado de cartao em tabela, log ou arquivo. A chave da subconta Asaas do casal e descartada; guardamos so `walletId`.
 - `Notification` nunca guarda telefone, e-mail ou texto da mensagem. Logs so com ids.
 - Dado pessoal real nunca entra no repositorio, nos testes nem no seed.
-- Texto do painel usa papel, nunca tamanho: `t-page`, `t-section`, `t-item`, `t-body`, `t-label`, `t-meta`, `t-value` (definidos em `src/app/globals.css`). Formulario usa `FORM_GRID` e `Field`. Cantos `rounded-xl`.
+- Fonte do sistema: Poppins, peso maximo 600. Texto do painel usa papel, nunca tamanho: `t-page`, `t-section`, `t-item`, `t-action`, `t-body`, `t-label`, `t-meta`, `t-group`, `t-chip`, `t-value`, `t-result` (definidos em `src/app/globals.css`, escala da Nautica). Formulario usa `FORM_GRID` e `Field`.
+- Cantos: cartao `rounded-2xl` com `shadow-card`, controle `rounded-lg`, item interno `rounded-xl`, chip `rounded-full`. Conteudo do painel ocupa a largura toda (sem `mx-auto`).
+- Texto editavel do site e do convite leva `cmsAttrs(...)` (`data-cms-path`). O mesmo caminho serve a previa do painel (`/previa/*`, campo com `data-cms-field`) e a edicao direto na pagina (tecla E). Caminho novo entra em `src/lib/cms.ts` (`maxLengthFor`) e em `saveInlineCopy`.
 - Todo texto de interface em portugues do Brasil, com acentos.
 
 ## Git

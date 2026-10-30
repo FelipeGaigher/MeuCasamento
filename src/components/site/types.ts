@@ -18,9 +18,4 @@ export function mapsHref(e: Pick<EventLite, "mapsUrl" | "address" | "venueName">
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${e.venueName}, ${e.address}`)}`;
 }
 
-// "Ana & Pedro" -> ["Ana", "& Pedro"], para quebrar os nomes em duas linhas.
-export function splitNames(coupleNames: string): [string, string | null] {
-  const m = coupleNames.split(/\s*(?:&|\se\s)\s*/i);
-  if (m.length >= 2 && m[0] && m[1]) return [m[0], `& ${m.slice(1).join(" & ")}`];
-  return [coupleNames, null];
-}
+export { splitNames } from "@/lib/cms";

@@ -16,39 +16,49 @@ function revalidate(slug: string) {
   revalidatePath(`/${slug}/convite`);
 }
 
-export async function setInvitationCollection(_: ActionState, form: FormData): Promise<ActionState> {
+function parseJson(raw: FormDataEntryValue | null): unknown {
+  try {
+    return JSON.parse(String(raw ?? ""));
+  } catch {
+    return null;
+  }
+}
+
+// Colecao, paginas ligadas e textos saem juntos do editor com previa.
+export async function saveInvitation(_: ActionState, form: FormData): Promise<ActionState> {
   const { wedding } = await requireWedding();
   const key = String(form.get("collectionKey") ?? "");
   if (!COLLECTIONS.some((c) => c.key === key)) return fail("Coleção inválida.");
-  await db.invitation.update({ where: { weddingId: wedding.id }, data: { collectionKey: key } });
+
+  const raw = parseJson(form.get("pages"));
+  if (!Array.isArray(raw)) return fail("Páginas inválidas.");
+  const sent = new Map<string, { enabled?: unknown; fields?: unknown }>();
+  for (const item of raw) if (item && typeof item === "object" && "kind" in item) sent.set(String(item.kind), item);
+
+  // So entram paginas e campos conhecidos; o resto do payload e ignorado.
+  const pages: InvitationPage[] = readPages(null, wedding.coupleNames).map((d) => {
+    const kind = d.kind as InvitationPageKind;
+    const page = sent.get(kind);
+    const given = page?.fields && typeof page.fields === "object" ? (page.fields as Record<string, unknown>) : {};
+    const fields: Record<string, string> = {};
+    for (const [field] of PAGE_FIELDS[kind]) {
+      const v = given[field];
+      fields[field] = typeof v === "string" ? v.trim().slice(0, MAX_FIELD) : "";
+    }
+    return { kind, enabled: page?.enabled !== false, fields };
+  });
+  if (!pages.some((p) => p.enabled)) return fail("Deixe pelo menos uma página ligada.");
+
+  await db.invitation.update({
+    where: { weddingId: wedding.id },
+    data: { collectionKey: key, pages: pages as unknown as Prisma.InputJsonValue },
+  });
   if (form.get("applyToSite") === "on") {
     await db.siteSettings.update({ where: { weddingId: wedding.id }, data: { collectionKey: key } });
     revalidatePath("/painel/site");
   }
   revalidate(wedding.slug);
-  return done("Coleção do convite atualizada.");
-}
-
-export async function saveInvitationPages(_: ActionState, form: FormData): Promise<ActionState> {
-  const { wedding } = await requireWedding();
-  const current = await db.invitation.findUnique({ where: { weddingId: wedding.id } });
-  const base = readPages(current?.pages, wedding.coupleNames);
-  const pages: InvitationPage[] = base.map((p) => {
-    const kind = p.kind as InvitationPageKind;
-    const fields: Record<string, string> = {};
-    for (const [key] of PAGE_FIELDS[kind]) {
-      const raw = form.get(`${kind}.${key}`);
-      fields[key] = typeof raw === "string" ? raw.trim().slice(0, MAX_FIELD) : p.fields[key] ?? "";
-    }
-    return { kind, enabled: form.get(`${kind}.enabled`) === "on", fields };
-  });
-  if (!pages.some((p) => p.enabled)) return fail("Deixe pelo menos uma página ligada.");
-  await db.invitation.update({
-    where: { weddingId: wedding.id },
-    data: { pages: pages as unknown as Prisma.InputJsonValue },
-  });
-  revalidate(wedding.slug);
-  return done("Textos do convite salvos.");
+  return done("Convite salvo.");
 }
 
 export async function markInvitationReviewed() {
